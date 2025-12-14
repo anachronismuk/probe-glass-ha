@@ -62,7 +62,7 @@ def on_disconnect(client, userdata, rc):
 def publish(client,TOPIC,msg):
   status=1
   retries=1
-  while status==1 and retries<4:
+  while status!=0 and retries<4:
     result = client.publish(TOPIC, msg)
     # result: [0, 1]
     status = result[0]
@@ -170,7 +170,7 @@ def glass_login():
 	else:
 		logger(f"Could not log in to glass: {response.status_code}")
 
-def create_glass():
+def create_glass(client):
 	device={
 		"dev": {
 			"ids": "glass_0001",
@@ -222,7 +222,7 @@ client=connect_mqtt(MQTT_CLIENT_ID,MQTT_BROKER,MQTT_PORT,MQTT_USERNAME,MQTT_PASS
 client.on_disconnect = on_disconnect
 
 while(1):
-	create_glass()
+	create_glass(client)
 	if not glass_check_token(glass_token):
 		logger("Token invalid - will try to get a new one")
 		glass_token=glass_login()
@@ -241,7 +241,7 @@ while(1):
 		}
 		publish(client,TOPIC+"/state",json.dumps(state).encode("utf-8"))
 	time.sleep(295)
-	publish(client,TOPIC+"/ping",'\{"ping": "{datetime.datetime.now().isoformat()}"\}')
+	publish(client,TOPIC+"/ping",f'{{"ping": "{datetime.datetime.now().isoformat()}"}}')
 	time.sleep(5)
 
 
