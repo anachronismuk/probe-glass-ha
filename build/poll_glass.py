@@ -205,11 +205,11 @@ def create_glass():
 			"usage today":
 			{
 				"p": "sensor",
-				"name":"kWh",
+				"name":"kWh_today",
 				"device_class":"energy",
 				"unit_of_measurement":"kWh",
 				"value_template":"{{ value_json.kwh_today }}",
-				"unique_id": "glass_kwh"
+				"unique_id": "glass_kwh_today"
 			}
 		},
 		"state_topic": TOPIC+"/state",
@@ -233,7 +233,7 @@ while(1):
 	logger(f"kWh today: {kWh_today}")
 	cost=glass_get_cost_today(resources,glass_token)/100
 	logger(f"Cost: {cost}")
-	if cost>=0 and kWh >=0 and kWh_today>0:
+	if cost>=0 and kWh >=0 and kWh_today>=0:
 		state={
 			"kwh": kWh,
 			"kwh_today": kWh_today,
