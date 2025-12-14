@@ -1,0 +1,13 @@
+services:
+  glass_probe:
+    image: docker.io/anachronism/glass-probe
+    build: .
+    command: python3 poll_glass.py
+    network_mode: bridge
+    environment:
+      BROKER: broker             # the mqtt broker hostname/up
+      BROKER_PORT: 1883          # the mqtt broker port
+      #BROKER_USERNAME: user     # the optional mqtt username
+      #BROKER_PASSWORD: pass     # the optional mqtt password
+      GLASS_USERNAME: me@you.com    # Vital Energi username
+      GLASS_PASSWORD: abcd1234      # Vital Energi password
