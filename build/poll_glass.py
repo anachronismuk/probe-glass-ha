@@ -133,7 +133,19 @@ def glass_get_cost_today(resources,token):
 	path=f'/api/v0-1/resource/{resources["heat energy cost"]}/readings?from={today}T00:00:00&to={today}T23:59:59&period=P1D&function=sum'
 	response=glass_get(GLASS_HOST,path,token)
 	if response.status_code == 200:
-		print(response.json())
+		if len(response.json()["data"])>0 and len(response.json()["data"][0])>1:
+			return response.json()["data"][0][1]
+		else:
+			return -1
+	else:
+		logger(f"Could not get cost value: {response.status_code}")
+		return -1
+
+def glass_get_kWh_today(resources,token):
+	today=datetime.datetime.today().strftime('%Y-%m-%d')
+	path=f'/api/v0-1/resource/{resources["heat energy"]}/readings?from={today}T00:00:00&to={today}T23:59:59&period=P1D&function=sum'
+	response=glass_get(GLASS_HOST,path,token)
+	if response.status_code == 200:
 		if len(response.json()["data"])>0 and len(response.json()["data"][0])>1:
 			return response.json()["data"][0][1]
 		else:
@@ -189,6 +201,15 @@ def create_glass():
 				"unit_of_measurement":"GBP",
 				"value_template":"{{ value_json.cost_today }}",
 				"unique_id": "glass_cost_today"
+			},
+			"usage today":
+			{
+				"p": "sensor",
+				"name":"kWh",
+				"device_class":"energy",
+				"unit_of_measurement":"kWh",
+				"value_template":"{{ value_json.kwh_today }}",
+				"unique_id": "glass_kwh"
 			}
 		},
 		"state_topic": TOPIC+"/state",
@@ -208,11 +229,14 @@ while(1):
 	resources=glass_get_resources(glass_token)
 	kWh=glass_get_kWh(resources,glass_token)
 	logger(f"kWh: {kWh}")
+	kWh_today=glass_get_kWh_today(resources,glass_token)
+	logger(f"kWh today: {kWh_today}")
 	cost=glass_get_cost_today(resources,glass_token)/100
 	logger(f"Cost: {cost}")
-	if cost>=0 and kWh >=0:
+	if cost>=0 and kWh >=0 and kWh_today>0:
 		state={
 			"kwh": kWh,
+			"kwh_today": kWh_today,
 			"cost_today": cost
 		}
 		publish(client,TOPIC+"/state",json.dumps(state).encode("utf-8"))
