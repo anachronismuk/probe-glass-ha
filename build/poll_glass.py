@@ -192,14 +192,14 @@ def create_glass(client):
 				"name":"kWh",
 				"device_class":"energy",
 				"unit_of_measurement":"kWh",
-				"value_template":"{{ value_json.kwh }}",
+				"value_template":"{{ value_json.kwh | float }}",
 				"unique_id": "glass_kwh"
 			},
 			"cost today":{
 				"p": "sensor",
 				"name":"Cost Today",
 				"unit_of_measurement":"GBP",
-				"value_template":"{{ value_json.cost_today }}",
+				"value_template":"{{ value_json.cost_today |float }}",
 				"unique_id": "glass_cost_today"
 			},
 			"usage today":
@@ -208,7 +208,7 @@ def create_glass(client):
 				"name":"kWh_today",
 				"device_class":"energy",
 				"unit_of_measurement":"kWh",
-				"value_template":"{{ value_json.kwh_today }}",
+				"value_template":"{{ value_json.kwh_today | float }}",
 				"unique_id": "glass_kwh_today"
 			}
 		},
