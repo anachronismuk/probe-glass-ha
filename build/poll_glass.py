@@ -191,6 +191,7 @@ def create_glass(client):
 				"p": "sensor",
 				"name":"kWh",
 				"device_class":"energy",
+				"state_class": "TOTAL_INCREASING",
 				"unit_of_measurement":"kWh",
 				"value_template":"{{ value_json.kwh | float }}",
 				"unique_id": "glass_kwh"
@@ -198,6 +199,7 @@ def create_glass(client):
 			"cost today":{
 				"p": "sensor",
 				"name":"Cost Today",
+				"state_class": "TOTAL_INCREASING",
 				"unit_of_measurement":"GBP",
 				"value_template":"{{ value_json.cost_today |float }}",
 				"unique_id": "glass_cost_today"
@@ -206,6 +208,7 @@ def create_glass(client):
 			{
 				"p": "sensor",
 				"name":"kWh_today",
+				"state_class": "TOTAL_INCREASING",
 				"device_class":"energy",
 				"unit_of_measurement":"kWh",
 				"value_template":"{{ value_json.kwh_today | float }}",
