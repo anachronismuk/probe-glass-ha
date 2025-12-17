@@ -243,7 +243,7 @@ while(1):
 			"cost_today": cost
 		}
 		publish(client,TOPIC+"/state",json.dumps(state).encode("utf-8"))
-	time.sleep(295)
+	time.sleep(55)
 	publish(client,TOPIC+"/ping",f'{{"ping": "{datetime.datetime.now().isoformat()}"}}')
 	time.sleep(5)
 
