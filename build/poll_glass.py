@@ -10,6 +10,7 @@ MQTT_USERNAME = os.getenv('BROKER_USERNAME')
 MQTT_PASSWORD = os.getenv('BROKER_PASSWORD')
 GLASS_USERNAME = os.getenv('GLASS_USERNAME')
 GLASS_PASSWORD = os.getenv('GLASS_PASSWORD')
+SLEEP = os.getenv('SLEEP',300)-5
 DIRECTORY_ID = "951cffa7-863f-4ae7-8f7e-ed682e690f91"
 APPLICATION_ID = "3c85d8bb-5cc7-4f17-a68b-8c52a90a6634"
 MQTT_BROKER = os.getenv('BROKER','mqtt')
@@ -117,7 +118,7 @@ def glass_get_resources(token):
 	return resources
 
 def glass_get_kWh(resources,token):
-	path=f'/api/v0-1/resource/{resources["heat energy"]}/meterread'
+	path=f'/api/v0-1/resource/{resources["heat energy"]}/current'
 	response=glass_get(GLASS_HOST,path,token)
 	if response.status_code == 200:
 		if len(response.json()["data"])>0 and len(response.json()["data"][0])>1:
@@ -151,7 +152,7 @@ def glass_get_kWh_today(resources,token):
 		else:
 			return -1
 	else:
-		logger(f"Could not get cost value: {response.status_code}")
+		logger(f"Could not get kWh value: {response.status_code}")
 		return -1
 
 def glass_login():
@@ -243,7 +244,7 @@ while(1):
 			"cost_today": cost
 		}
 		publish(client,TOPIC+"/state",json.dumps(state).encode("utf-8"))
-	time.sleep(55)
+	time.sleep(SLEEP)
 	publish(client,TOPIC+"/ping",f'{{"ping": "{datetime.datetime.now().isoformat()}"}}')
 	time.sleep(5)
 
