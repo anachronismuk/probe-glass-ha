@@ -118,7 +118,7 @@ def glass_get_resources(token):
 	return resources
 
 def glass_get_kWh(resources,token):
-	path=f'/api/v0-1/resource/{resources["heat energy"]}/current'
+	path=f'/api/v0-1/resource/{resources["heat energy"]}/meterread'
 	response=glass_get(GLASS_HOST,path,token)
 	if response.status_code == 200:
 		if len(response.json()["data"])>0 and len(response.json()["data"][0])>1:
