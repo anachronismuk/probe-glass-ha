@@ -231,6 +231,8 @@ def create_glass(client):
 	}
 	publish(client, "homeassistant/device/glass/config", json.dumps(device).encode("utf-8"))
 
+def now():
+	return int(time.time())
 
 client=connect_mqtt(MQTT_CLIENT_ID,MQTT_BROKER,MQTT_PORT,MQTT_USERNAME,MQTT_PASSWORD)
 client.on_disconnect = on_disconnect
