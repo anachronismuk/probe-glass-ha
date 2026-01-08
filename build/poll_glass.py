@@ -218,11 +218,11 @@ def create_glass(client):
 			"power estimation":
 			{
 				"p": "sensor",
-				"name":"kW",
+				"name":"kW_estimation",
 				"state_class": "MEASUREMENT",
 				"device_class":"power",
 				"unit_of_measurement":"kW",
-				"value_template":"{{ value_json.power_estimation | float }}",
+				"value_template":"{{ value_json.kw_estimation | float }}",
 				"unique_id": "glass_kw_estimation"
 			}
 		},
