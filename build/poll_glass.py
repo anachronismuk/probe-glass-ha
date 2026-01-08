@@ -214,6 +214,16 @@ def create_glass(client):
 				"unit_of_measurement":"kWh",
 				"value_template":"{{ value_json.kwh_today | float }}",
 				"unique_id": "glass_kwh_today"
+			},
+			"power estimation":
+			{
+				"p": "sensor",
+				"name":"kW",
+				"state_class": "MEASUREMENT",
+				"device_class":"power",
+				"unit_of_measurement":"kW",
+				"value_template":"{{ value_json.power_estimation | float }}",
+				"unique_id": "glass_kw_estimation"
 			}
 		},
 		"state_topic": TOPIC+"/state",
@@ -225,13 +235,33 @@ def create_glass(client):
 client=connect_mqtt(MQTT_CLIENT_ID,MQTT_BROKER,MQTT_PORT,MQTT_USERNAME,MQTT_PASSWORD)
 client.on_disconnect = on_disconnect
 
+changed=false
+previous_value=-1
+previous_time=now()
+power_estimation=0
+ignore_first=true
 while(1):
+	start=now()
 	create_glass(client)
 	if not glass_check_token(glass_token):
 		logger("Token invalid - will try to get a new one")
 		glass_token=glass_login()
 	resources=glass_get_resources(glass_token)
 	kWh=glass_get_kWh(resources,glass_token)
+	if kWh != previous_value:
+		if previous_value!=-1:
+			changed=true
+		previous_value=kWh
+	if changed and not ignore_first:
+		power_estimation=1/((now()-previous_time)/3600)
+		previous_time=now()
+		changed=false
+		logger(f"kW estimation: {power_estimation}")
+	if changed and ignore_first:
+		previous_time=now()
+		ignore_first=false
+		changed=false
+		logger(f"kW estimation not made - just starting")
 	logger(f"kWh: {kWh}")
 	kWh_today=glass_get_kWh_today(resources,glass_token)
 	logger(f"kWh today: {kWh_today}")
@@ -241,10 +271,11 @@ while(1):
 		state={
 			"kwh": kWh,
 			"kwh_today": kWh_today,
-			"cost_today": cost
+			"cost_today": cost,
+			"kw_estimation": power_estimation
 		}
 		publish(client,TOPIC+"/state",json.dumps(state).encode("utf-8"))
-	time.sleep(SLEEP)
+	time.sleep(SLEEP-(now()-start-5))
 	publish(client,TOPIC+"/ping",f'{{"ping": "{datetime.datetime.now().isoformat()}"}}')
 	time.sleep(5)
 
