@@ -235,11 +235,11 @@ def create_glass(client):
 client=connect_mqtt(MQTT_CLIENT_ID,MQTT_BROKER,MQTT_PORT,MQTT_USERNAME,MQTT_PASSWORD)
 client.on_disconnect = on_disconnect
 
-changed=false
+changed=False
 previous_value=-1
 previous_time=now()
 power_estimation=0
-ignore_first=true
+ignore_first=True
 while(1):
 	start=now()
 	create_glass(client)
@@ -250,17 +250,17 @@ while(1):
 	kWh=glass_get_kWh(resources,glass_token)
 	if kWh != previous_value:
 		if previous_value!=-1:
-			changed=true
+			changed=True
 		previous_value=kWh
 	if changed and not ignore_first:
 		power_estimation=1/((now()-previous_time)/3600)
 		previous_time=now()
-		changed=false
+		changed=False
 		logger(f"kW estimation: {power_estimation}")
 	if changed and ignore_first:
 		previous_time=now()
-		ignore_first=false
-		changed=false
+		ignore_first=False
+		changed=False
 		logger(f"kW estimation not made - just starting")
 	logger(f"kWh: {kWh}")
 	kWh_today=glass_get_kWh_today(resources,glass_token)
