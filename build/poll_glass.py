@@ -264,6 +264,8 @@ while(1):
 		ignore_first=False
 		changed=False
 		logger(f"kW estimation not made - just starting")
+	if now()-previous_time>3600:
+		power_estimation=0
 	logger(f"kWh: {kWh}")
 	kWh_today=glass_get_kWh_today(resources,glass_token)
 	logger(f"kWh today: {kWh_today}")
