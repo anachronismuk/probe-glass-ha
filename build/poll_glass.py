@@ -10,7 +10,7 @@ MQTT_USERNAME = os.getenv('BROKER_USERNAME')
 MQTT_PASSWORD = os.getenv('BROKER_PASSWORD')
 GLASS_USERNAME = os.getenv('GLASS_USERNAME')
 GLASS_PASSWORD = os.getenv('GLASS_PASSWORD')
-SLEEP = int(os.getenv('SLEEP',300))-5
+SLEEP = int(os.getenv('SLEEP',300))
 DIRECTORY_ID = "951cffa7-863f-4ae7-8f7e-ed682e690f91"
 APPLICATION_ID = "3c85d8bb-5cc7-4f17-a68b-8c52a90a6634"
 MQTT_BROKER = os.getenv('BROKER','mqtt')
@@ -22,6 +22,7 @@ MQTT_CLIENT_ID = f'glass-mqtt-{random.randint(0, 1000)}'
 FIRST_RECONNECT_DELAY = 1
 RECONNECT_RATE = 2
 MAX_RECONNECT_DELAY = 60
+POWER_ESTIMATION_RESET=int(os.getenv('POWER_ESTIMATION_RESET',7200))
 
 def connect_mqtt(client_id,broker,port,username,password):
     def on_connect(client, userdata, flags, rc):
@@ -264,8 +265,9 @@ while(1):
 		ignore_first=False
 		changed=False
 		logger(f"kW estimation not made - just starting")
-	if now()-previous_time>3600:
+	if now()-previous_time>=POWER_ESTIMATION_RESET:
 		power_estimation=0
+		logger(f"Setting our Power estimation to zero as more than {POWER_ESTIMATION_RESET} has elapsed since we saw any activity.")
 	logger(f"kWh: {kWh}")
 	kWh_today=glass_get_kWh_today(resources,glass_token)
 	logger(f"kWh today: {kWh_today}")
@@ -279,7 +281,9 @@ while(1):
 			"kw_estimation": power_estimation
 		}
 		publish(client,TOPIC+"/state",json.dumps(state).encode("utf-8"))
-	time.sleep(SLEEP-(now()-start-5))
+	sleep_for=(SLEEP-(now()-start-5))
+	if sleep_for>0:
+		time.sleep(sleep_for)
 	publish(client,TOPIC+"/ping",f'{{"ping": "{datetime.datetime.now().isoformat()}"}}')
 	time.sleep(5)
 

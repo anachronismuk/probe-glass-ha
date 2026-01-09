@@ -12,3 +12,6 @@ services:
       GLASS_USERNAME: me@you.com    # Vital Energi username
       GLASS_PASSWORD: abcd1234      # Vital Energi password
       #SLEEP: 300                # Time between polls
+      POWER_ESTIMATION_RESET: 7200 # If we don't see any kWh 
+                                   # usage in this many seconds,
+                                   # zero power estimation.
